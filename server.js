@@ -1,20 +1,27 @@
 const express = require('express');
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { initializeApp, applicationDefault } = require('firebase-admin/app');
 const { getFirestore, collection, addDoc, updateDoc, doc, deleteDoc, query, where, getDocs } = require('firebase-admin/firestore');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path');
+const path = require('path'); // Importe o módulo path aqui
 
 const app = express();
 const port = process.env.PORT || 4000;
+
+const admin = require('firebase-admin');
+
+// Caminho para o arquivo JSON de suas credenciais de serviço
+const serviceAccount = path.join(__dirname, 'public', 'eventos-15ff4-firebase-adminsdk-udlqm-af2c49d82a.json');
+
+// Inicialize o aplicativo do Firebase Admin SDK com suas credenciais de serviço
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-initializeApp({
-    credential: applicationDefault()
-});
 const db = getFirestore();
 
 app.post('/api/eventos', async (req, res) => {
@@ -36,6 +43,9 @@ app.post('/api/eventos', async (req, res) => {
         res.status(500).send("Erro ao adicionar evento");
     }
 });
+
+// Restante do código permanece o mesmo
+
 
 app.put('/api/eventos/:id', async (req, res) => {
     const { id } = req.params;
