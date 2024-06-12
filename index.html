@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <nav id="navegador">
+            <div id="icone"><img id="iconeSite" src="iconeSite.png" alt="Icone do Site">Gerenciador de Tarefas</div>
+            <h2><a id="opcaoAtual" href="index.html">EVENTOS</a></h2>
+            <h2><a id="opcaoFinalizados" href="finalizados.html">FINALIZADOS</a></h2>
+            <h2><a id="opcaoCalendario" href="calendario.html">CALENDÁRIO</a></h2>
+        </nav>
+        <div id="container">
+            <div id="barraPesquisa">
+                <p>Eventos Cadastrados:</p>
+                <input type="text" placeholder="Procurar evento" id="pesquisaEvento">
+                <select id="filtroStatus">
+                    <option value="">Todos</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Em Andamento">Em Andamento</option>
+                    <option value="Concluído">Concluído</option>
+                </select>
+            </div>
+            <p></p>
+            <button id="adicionarEvento">Adicionar Evento</button>
+            <table id="tabelaEventos">
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Título</th>
+                        <th>Categoria</th>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="botoesEventos">
+                <button id="atualizarEventos">Atualizar</button>
+                <button id="limparEventos">Limpar Eventos</button>
+            </div>
+            <div id="feedback"></div>
+            <footer>Gabriel Gallonetto de Lima</footer>
+        </div>
+    </main>
+    <script src="prototipo.js" defer></script>
+</body>
+</html>

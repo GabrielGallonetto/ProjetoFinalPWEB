@@ -1,0 +1,225 @@
+/* Estilos para o main */
+main {
+    display: flex;
+    height: 100vh; 
+}
+
+/* Estilos para o navegador */
+#navegador {
+    background-color: transparent;
+    width: 15%;
+    padding: 1% 1%;
+    font-size: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    color: #ECECEC;
+}
+
+/* Estilos para o container */
+#container {
+    background-color: #ECECEC;
+    width: 85%;
+    padding: 1%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    overflow-y: hidden;
+    border-radius: 2%;
+    margin-bottom: 2%;
+    margin-right: 1%;
+    overflow-y: auto;
+    max-height: 100vh;
+}
+
+#container p {
+    font-size: 24px;
+}
+
+/* Estilos para os títulos h2 */
+h2 {
+    margin-left: 10%;
+    margin-top: 3%;
+}
+
+/* Estilo para a opção atual */
+#opcaoAtual {
+    color: #474787;
+}
+
+/* Estilos para os links */
+a {
+    color: #025570;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Estilos para o body */
+body {
+    background-image: linear-gradient(200deg, rgba(213, 213, 213, 0.01) 0%, rgba(213, 213, 213, 0.01) 14.286%, rgba(140, 140, 140, 0.01) 14.286%,
+            rgba(140, 140, 140, 0.01) 28.572%, rgba(52, 52, 52, 0.01) 28.572%, rgba(52, 52, 52, 0.01) 42.858%, rgba(38, 38, 38, 0.01) 42.858%,
+            rgba(38, 38, 38, 0.01) 57.144%, rgba(159, 159, 159, 0.01) 57.144%, rgba(159, 159, 159, 0.01) 71.42999999999999%,
+            rgba(71, 71, 71, 0.01) 71.43%, rgba(71, 71, 71, 0.01) 85.71600000000001%, rgba(88, 88, 88, 0.01) 85.716%, rgba(88, 88, 88, 0.01) 100.002%),
+        linear-gradient(337deg, rgba(25, 25, 25, 0.01) 0%, rgba(25, 25, 25, 0.01) 12.5%, rgba(150, 150, 150, 0.01) 12.5%, rgba(150, 150, 150, 0.01) 25%,
+            rgba(84, 84, 84, 0.01) 25%, rgba(84, 84, 84, 0.01) 37.5%, rgba(85, 85, 85, 0.01) 37.5%, rgba(85, 85, 85, 0.01) 50%, rgba(188, 188, 188, 0.01) 50%,
+            rgba(188, 188, 188, 0.01) 62.5%, rgba(80, 80, 80, 0.01) 62.5%, rgba(80, 80, 80, 0.01) 75%, rgba(73, 73, 73, 0.01) 75%, rgba(73, 73, 73, 0.01) 87.5%,
+            rgba(219, 219, 219, 0.01) 87.5%, rgba(219, 219, 219, 0.01) 100%), linear-gradient(203deg, rgba(233, 233, 233, 0.01) 0%,
+            rgba(233, 233, 233, 0.01) 25%, rgba(114, 114, 114, 0.01) 25%, rgba(114, 114, 114, 0.01) 50%, rgba(164, 164, 164, 0.01) 50%,
+            rgba(164, 164, 164, 0.01) 75%, rgba(228, 228, 228, 0.01) 75%, rgba(228, 228, 228, 0.01) 100%), linear-gradient(317deg, rgba(139, 139, 139, 0.02) 0%,
+            rgba(139, 139, 139, 0.02) 16.667%, rgba(44, 44, 44, 0.02) 16.667%, rgba(44, 44, 44, 0.02) 33.334%, rgba(166, 166, 166, 0.02) 33.334%,
+            rgba(166, 166, 166, 0.02) 50.001000000000005%, rgba(2, 2, 2, 0.02) 50.001%, rgba(2, 2, 2, 0.02) 66.668%, rgba(23, 23, 23, 0.02) 66.668%,
+            rgba(23, 23, 23, 0.02) 83.33500000000001%, rgba(21, 21, 21, 0.02) 83.335%, rgba(21, 21, 21, 0.02) 100.002%), linear-gradient(328deg,
+            rgba(3, 3, 3, 0.03) 0%, rgba(3, 3, 3, 0.03) 12.5%, rgba(116, 116, 116, 0.03) 12.5%, rgba(116, 116, 116, 0.03) 25%, rgba(214, 214, 214, 0.03) 25%,
+            rgba(214, 214, 214, 0.03) 37.5%, rgba(217, 217, 217, 0.03) 37.5%, rgba(217, 217, 217, 0.03) 50%, rgba(68, 68, 68, 0.03) 50%,
+            rgba(68, 68, 68, 0.03) 62.5%, rgba(118, 118, 118, 0.03) 62.5%, rgba(118, 118, 118, 0.03) 75%, rgba(200, 200, 200, 0.03) 75%,
+            rgba(200, 200, 200, 0.03) 87.5%, rgba(198, 198, 198, 0.03) 87.5%, rgba(198, 198, 198, 0.03) 100%), linear-gradient(97deg,
+            rgba(195, 195, 195, 0.03) 0%, rgba(195, 195, 195, 0.03) 16.667%, rgba(177, 177, 177, 0.03) 16.667%, rgba(177, 177, 177, 0.03) 33.334%,
+            rgba(170, 170, 170, 0.03) 33.334%, rgba(170, 170, 170, 0.03) 50.001000000000005%, rgba(158, 158, 158, 0.03) 50.001%, rgba(158, 158, 158, 0.03) 66.668%,
+            rgba(121, 121, 121, 0.03) 66.668%, rgba(121, 121, 121, 0.03) 83.33500000000001%, rgba(146, 146, 146, 0.03) 83.335%, rgba(146, 146, 146, 0.03) 100.002%),
+        linear-gradient(268deg, rgba(103, 103, 103, 0.03) 0%, rgba(103, 103, 103, 0.03) 25%, rgba(112, 112, 112, 0.03) 25%, rgba(112, 112, 112, 0.03) 50%,
+            rgba(4, 4, 4, 0.03) 50%, rgba(4, 4, 4, 0.03) 75%, rgba(227, 227, 227, 0.03) 75%, rgba(227, 227, 227, 0.03) 100%),
+        linear-gradient(90deg, rgb(44, 44, 84), rgb(44, 44, 84));
+    overflow-y: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #2C2C54;
+}
+
+/* Estilos para os links ao passar o mouse */
+a:hover {
+    color: #AAABB8;
+}
+
+#pesquisa {
+    border: 0px rgba(220, 220, 220, 0);
+    border-bottom: 2px solid rgb(150, 150, 150);
+}
+
+#imgPesquisar {
+    width: 1.5%;
+    cursor: pointer;
+}
+
+#botoesEventos {
+    margin-top: 1%;
+    margin-right: 1%;
+}
+
+/* Estilos para a tabela de eventos */
+#tabelaEventos {
+    width: 100%;
+    border-collapse: collapse;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+}
+
+#tabelaEventos th,
+#tabelaEventos td {
+    border: 2px solid #000000;
+    padding: 8px;
+    text-align: center;
+    align-items: center;
+}
+
+#tabelaEventos th {
+    background-color: #474787;
+    color: #ECECEC;
+}
+
+#tabelaEventos th button {
+    margin: 1%;
+}
+
+#tabelaEventos td input,
+#tabelaEventos td select {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    border: #000000 1px solid;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+button {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #2C2C54;
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #474787;
+}
+
+#limparEventos {
+    margin-left: 60%;
+}
+
+#tabelaPrincipal {
+    background-color: #AAABB8;
+}
+
+th {
+    background-color: #2C2C54;
+}
+
+#icone {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+}
+
+#iconeSite {
+    width: 30%;
+    margin-right: 10px; /* Espaço entre a imagem e o texto */
+}
+
+#feedback {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    text-align: center;
+}
+
+#feedback.success {
+    background-color: #AAABB8;
+    color: #155724;
+    display: block;
+}
+
+#feedback.error {
+    background-color: #AAABB8;
+    color: #721c24;
+    display: block;
+}
+
+button {
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+/* Adicione estas regras de estilo para as cores de fundo */
+tr[data-status="Concluído"] {
+    background-color: blue;
+}
+
+tr[data-proximidade="alta"] {
+    background-color: red;
+}
+
+tr[data-proximidade="media"] {
+    background-color: yellow;
+}
+
+tr[data-proximidade="baixa"] {
+    background-color: green;
+}
+
+#calendar {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 10px;
+}
