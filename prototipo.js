@@ -197,14 +197,19 @@ const pesquisarEventos = () => {
 const buscarEventos = (status = '') => {
     fetch(`https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos?status=${status}`)
         .then(response => {
-            if (!response.ok) throw new Error('Erro ao buscar eventos');
+            if (!response.ok) {
+                throw new Error('Erro ao buscar eventos');
+            }
             return response.json();
         })
         .then(eventos => {
             tabelaEventos.innerHTML = '';
             eventos.forEach(evento => adicionarLinhaEvento(evento));
         })
-        .catch(error => console.error('Erro ao buscar eventos:', error));
+        .catch(error => {
+            console.error('Erro ao buscar eventos:', error);
+            mostrarFeedback('Erro ao buscar eventos', 'error');
+        });
 };
 
 // Função para salvar um evento
