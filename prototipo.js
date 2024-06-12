@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Funções de manipulação de DOM e Event Listeners
 const adicionarEventListeners = () => {
     inputPesquisa.addEventListener('input', pesquisarEventos);
-    botaoAdicionar.addEventListener('click', () => adicionarLinhaEvento());
+    botaoAdicionar.addEventListener('click', adicionarLinhaEvento);
     filtroStatus.addEventListener('change', () => buscarEventos(filtroStatus.value));
 
     if (document.title === 'Finalizados') {
@@ -162,12 +162,13 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
+        linha.appendChild(tdAcoes);
+
+        // Chamar a função para definir a cor da linha
+        definirCorLinha(linha, evento);
+
+        return linha;
     }
-
-    linha.appendChild(tdAcoes);
-
-    // Chamar a função para definir a cor da linha
-    definirCorLinha(linha, evento);
 
     tabelaEventos.appendChild(linha);
 };
@@ -192,111 +193,91 @@ const pesquisarEventos = () => {
     });
 };
 
-
 // Função para buscar eventos com base no status
-const buscarEventos = async (status) => {
-    try {
-        const response = await axios.get(`/api/eventos?status=${status}`);
-        const eventos = response.data;
-
-        // Limpar a tabela antes de adicionar os novos eventos
-        tabelaEventos.innerHTML = '';
-
-        eventos.forEach(evento => {
-            criarLinhaEvento(evento);
+const buscarEventos = (status = '') => {
+    axios.get(`/api/eventos?status=${status}`)
+        .then(response => {
+            tabelaEventos.innerHTML = '';
+            response.data.forEach(evento => adicionarLinhaEvento(evento));
+        })
+        .catch(error => {
+            console.error('Erro ao buscar eventos:', error);
         });
-
-        mostrarFeedback(`Eventos ${status} carregados com sucesso.`, 'alert alert-success');
-    } catch (error) {
-        console.error('Erro ao buscar eventos:', error);
-        mostrarFeedback('Erro ao buscar eventos.', 'alert alert-danger');
-    }
 };
 
-// Função para atualizar eventos ao pressionar o botão Atualizar
-const atualizarEventos = () => {
-    const statusSelecionado = filtroStatus.value;
-    buscarEventos(statusSelecionado);
-};
-
-// Função para salvar um evento (editar ou adicionar)
-const salvarEvento = async (linha) => {
-    const id = linha.dataset.id;
-    const inputId = linha.querySelector('td:nth-child(1) input').value;
-    const inputTitulo = linha.querySelector('td:nth-child(2) input').value;
-    const selectCategoria = linha.querySelector('td:nth-child(3) select').value;
-    const inputData = linha.querySelector('td:nth-child(4) input').value;
-    const inputDescricao = linha.querySelector('td:nth-child(5) input').value;
-    const selectPrioridade = linha.querySelector('td:nth-child(6) select').value;
-    const selectStatus = linha.querySelector('td:nth-child(7) select').value;
-
-    const evento = {
-        id: id || inputId,
-        titulo: inputTitulo,
-        categoria: selectCategoria,
-        data: inputData,
-        descricao: inputDescricao,
-        prioridade: selectPrioridade,
-        status: selectStatus
+// Função para salvar um evento
+const salvarEvento = (linha) => {
+    const id = linha.dataset.id || null;
+    const novoEvento = {
+        titulo: linha.querySelector('td:nth-child(2) input').value,
+        categoria: linha.querySelector('td:nth-child(3) select').value,
+        data: linha.querySelector('td:nth-child(4) input').value,
+        descricao: linha.querySelector('td:nth-child(5) input').value,
+        prioridade: linha.querySelector('td:nth-child(6) select').value,
+        status: linha.querySelector('td:nth-child(7) select').value
     };
 
-    try {
-        let response;
-        if (id) {
-            // Editar evento existente
-            response = await axios.put(`/api/eventos/${id}`, evento);
-            mostrarFeedback('Evento atualizado com sucesso.', 'alert alert-success');
-        } else {
-            // Adicionar novo evento
-            response = await axios.post('/api/eventos', evento);
-            linha.dataset.id = response.data.id; // Atualiza o ID do evento na linha
-            mostrarFeedback('Evento adicionado com sucesso.', 'alert alert-success');
-        }
-    } catch (error) {
-        console.error('Erro ao salvar evento:', error);
-        mostrarFeedback('Erro ao salvar evento.', 'alert alert-danger');
-    }
-};
-
-// Função para cancelar a adição de uma nova linha de evento
-const cancelarAdicao = (linha) => {
-    if (!linha.dataset.id) {
-        linha.remove(); // Remove a linha apenas se ainda não foi salva
+    if (id) { // Atualizar evento existente
+        axios.put(`/api/eventos/${id}`, novoEvento)
+            .then(response => {
+                mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
+            })
+            .catch(error => {
+                console.error('Erro ao atualizar evento:', error);
+                mostrarFeedback('Erro ao atualizar evento', 'alert alert-danger');
+            });
+    } else { // Salvar novo evento
+        axios.post('/api/eventos', novoEvento)
+            .then(response => {
+                linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
+                mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
+            })
+            .catch(error => {
+                console.error('Erro ao salvar evento:', error);
+                mostrarFeedback('Erro ao salvar evento', 'alert alert-danger');
+            });
     }
 };
 
 // Função para excluir um evento
-const excluirEvento = async (id) => {
-    try {
-        await axios.delete(`/api/eventos/${id}`);
-        document.querySelector(`tr[data-id="${id}"]`).remove();
-        mostrarFeedback('Evento excluído com sucesso.', 'alert alert-success');
-    } catch (error) {
-        console.error('Erro ao excluir evento:', error);
-        mostrarFeedback('Erro ao excluir evento.', 'alert alert-danger');
-    }
+const excluirEvento = (id) => {
+    axios.delete(`/api/eventos/${id}`)
+        .then(response => {
+            mostrarFeedback('Evento excluído com sucesso!', 'alert alert-success');
+            buscarEventos(filtroStatus.value); // Atualizar a lista de eventos após exclusão
+        })
+        .catch(error => {
+            console.error('Erro ao excluir evento:', error);
+            mostrarFeedback('Erro ao excluir evento', 'alert alert-danger');
+        });
 };
 
-// Função para atualizar eventos concluídos (página de eventos concluídos)
-const atualizarEventosConcluidos = () => {
-    buscarEventos('Concluído');
+// Função para atualizar a lista de eventos
+const atualizarEventos = () => {
+    buscarEventos(filtroStatus.value);
+};
+
+// Função para cancelar a adição ou edição de um evento
+const cancelarAdicao = (linha) => {
+    if (!linha.dataset.id) { // Remover a linha apenas se for uma adição cancelada
+        linha.remove();
+    }
 };
 
 // Função para inicializar o calendário
 const inicializarCalendario = () => {
-    // Inicialização do calendário utilizando biblioteca externa (exemplo com FullCalendar)
-    // Aqui você deve integrar o FullCalendar ou outra biblioteca de calendário de sua escolha
-    // Exemplo básico utilizando FullCalendar:
-    const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth'
-        // Outras configurações conforme necessário
+    const calendar = new FullCalendar.Calendar(calendario, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: '/api/eventos'
     });
     calendar.render();
 };
 
-// Chamada para inicializar o calendário após o carregamento do DOM
-document.addEventListener('DOMContentLoaded', () => {
-    inicializarCalendario();
-});
+// Inicialização do calendário
+inicializarCalendario();
 
