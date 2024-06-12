@@ -195,7 +195,7 @@ const pesquisarEventos = () => {
 
 // Função para buscar eventos com base no status
 const buscarEventos = (status = '') => {
-    fetch(`http://localhost:4000/api/eventos?status=${status}`)
+    fetch(`https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos?status=${status}`)
         .then(response => {
             if (!response.ok) throw new Error('Erro ao buscar eventos');
             return response.json();
@@ -219,7 +219,7 @@ const salvarEvento = (linha) => {
         status: linha.querySelector('td:nth-child(7) select').value
     };
 
-    const url = id ? `http://localhost:4000/api/eventos/${id}` : 'http://localhost:4000/api/eventos';
+    const url = id ? `https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos/${id}` : 'https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos';
     const method = id ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -231,7 +231,7 @@ const salvarEvento = (linha) => {
             if (response.ok) {
                 // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
                 buscarEventos(filtroStatus.value);
-                mostrarFeedback(id ? 'Evento atualizado comsucesso!' : 'Evento adicionado com sucesso!', 'success');
+                mostrarFeedback(id ? 'Evento atualizado com sucesso!' : 'Evento adicionado com sucesso!', 'success');
             } else {
                 throw new Error('Erro ao salvar evento');
             }
@@ -242,6 +242,7 @@ const salvarEvento = (linha) => {
         });
 };
 
+
 // Função para cancelar a adição de um novo evento
 const cancelarAdicao = (linha) => {
     linha.remove();
@@ -249,7 +250,7 @@ const cancelarAdicao = (linha) => {
 
 // Função para excluir um evento
 const excluirEvento = (id) => {
-    fetch(`http://localhost:4000/api/eventos/${id}`, {
+    fetch(`https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos/${id}`, {
         method: 'DELETE'
     })
         .then(response => {
@@ -288,7 +289,7 @@ const limparTabelaEventos = () => {
 document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
-    fetch('http://localhost:4000/api/eventos')
+    fetch('https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos')
         .then(response => response.json())
         .then(eventos => {
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -334,3 +335,4 @@ function getColorByDateAndStatus(date, status) {
         return '#18ff00';
     }
 }
+
