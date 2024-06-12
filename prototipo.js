@@ -162,13 +162,12 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
-        linha.appendChild(tdAcoes);
-
-        // Chamar a função para definir a cor da linha
-        definirCorLinha(linha, evento);
-
-        return linha;
     }
+
+    linha.appendChild(tdAcoes);
+
+    // Chamar a função para definir a cor da linha
+    definirCorLinha(linha, evento);
 
     tabelaEventos.appendChild(linha);
 };
@@ -193,151 +192,111 @@ const pesquisarEventos = () => {
     });
 };
 
+
 // Função para buscar eventos com base no status
-const buscarEventos = (status = '') => {
-    fetch(`https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos?status=${status}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao buscar eventos');
-            }
-            return response.json();
-        })
-        .then(eventos => {
-            tabelaEventos.innerHTML = '';
-            eventos.forEach(evento => adicionarLinhaEvento(evento));
-        })
-        .catch(error => {
-            console.error('Erro ao buscar eventos:', error);
-            mostrarFeedback('Erro ao buscar eventos', 'error');
+const buscarEventos = async (status) => {
+    try {
+        const response = await axios.get(`/api/eventos?status=${status}`);
+        const eventos = response.data;
+
+        // Limpar a tabela antes de adicionar os novos eventos
+        tabelaEventos.innerHTML = '';
+
+        eventos.forEach(evento => {
+            criarLinhaEvento(evento);
         });
+
+        mostrarFeedback(`Eventos ${status} carregados com sucesso.`, 'alert alert-success');
+    } catch (error) {
+        console.error('Erro ao buscar eventos:', error);
+        mostrarFeedback('Erro ao buscar eventos.', 'alert alert-danger');
+    }
 };
 
-// Função para salvar um evento
-const salvarEvento = (linha) => {
-    const id = linha.dataset.id || null;
-    const novoEvento = {
-        titulo: linha.querySelector('td:nth-child(2) input').value,
-        categoria: linha.querySelector('td:nth-child(3) select').value,
-        data: linha.querySelector('td:nth-child(4) input').value,
-        descricao: linha.querySelector('td:nth-child(5) input').value,
-        prioridade: linha.querySelector('td:nth-child(6) select').value,
-        status: linha.querySelector('td:nth-child(7) select').value
+// Função para atualizar eventos ao pressionar o botão Atualizar
+const atualizarEventos = () => {
+    const statusSelecionado = filtroStatus.value;
+    buscarEventos(statusSelecionado);
+};
+
+// Função para salvar um evento (editar ou adicionar)
+const salvarEvento = async (linha) => {
+    const id = linha.dataset.id;
+    const inputId = linha.querySelector('td:nth-child(1) input').value;
+    const inputTitulo = linha.querySelector('td:nth-child(2) input').value;
+    const selectCategoria = linha.querySelector('td:nth-child(3) select').value;
+    const inputData = linha.querySelector('td:nth-child(4) input').value;
+    const inputDescricao = linha.querySelector('td:nth-child(5) input').value;
+    const selectPrioridade = linha.querySelector('td:nth-child(6) select').value;
+    const selectStatus = linha.querySelector('td:nth-child(7) select').value;
+
+    const evento = {
+        id: id || inputId,
+        titulo: inputTitulo,
+        categoria: selectCategoria,
+        data: inputData,
+        descricao: inputDescricao,
+        prioridade: selectPrioridade,
+        status: selectStatus
     };
 
-    const url = id ? `https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos/${id}` : 'https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos';
-    const method = id ? 'PUT' : 'POST';
-
-    fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(novoEvento)
-    })
-        .then(response => {
-            if (response.ok) {
-                // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
-                buscarEventos(filtroStatus.value);
-                mostrarFeedback(id ? 'Evento atualizado com sucesso!' : 'Evento adicionado com sucesso!', 'success');
-            } else {
-                throw new Error('Erro ao salvar evento');
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao salvar evento:', error);
-            mostrarFeedback('Erro ao salvar evento', 'error');
-        });
+    try {
+        let response;
+        if (id) {
+            // Editar evento existente
+            response = await axios.put(`/api/eventos/${id}`, evento);
+            mostrarFeedback('Evento atualizado com sucesso.', 'alert alert-success');
+        } else {
+            // Adicionar novo evento
+            response = await axios.post('/api/eventos', evento);
+            linha.dataset.id = response.data.id; // Atualiza o ID do evento na linha
+            mostrarFeedback('Evento adicionado com sucesso.', 'alert alert-success');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar evento:', error);
+        mostrarFeedback('Erro ao salvar evento.', 'alert alert-danger');
+    }
 };
 
-
-// Função para cancelar a adição de um novo evento
+// Função para cancelar a adição de uma nova linha de evento
 const cancelarAdicao = (linha) => {
-    linha.remove();
+    if (!linha.dataset.id) {
+        linha.remove(); // Remove a linha apenas se ainda não foi salva
+    }
 };
 
 // Função para excluir um evento
-const excluirEvento = (id) => {
-    fetch(`https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos/${id}`, {
-        method: 'DELETE'
-    })
-        .then(response => {
-            if (response.ok) {
-                // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
-                buscarEventos(filtroStatus.value);
-                mostrarFeedback('Evento excluído com sucesso!', 'success');
-            } else {
-                throw new Error('Erro ao excluir evento');
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao excluir evento:', error);
-            mostrarFeedback('Erro ao excluir evento', 'error');
-        });
+const excluirEvento = async (id) => {
+    try {
+        await axios.delete(`/api/eventos/${id}`);
+        document.querySelector(`tr[data-id="${id}"]`).remove();
+        mostrarFeedback('Evento excluído com sucesso.', 'alert alert-success');
+    } catch (error) {
+        console.error('Erro ao excluir evento:', error);
+        mostrarFeedback('Erro ao excluir evento.', 'alert alert-danger');
+    }
 };
 
-// Função para atualizar eventos com base no status selecionado
-const atualizarEventos = () => {
-    buscarEventos(filtroStatus.value);
-    mostrarFeedback('Eventos atualizados com sucesso!', 'success');
-};
-
-// Função para atualizar eventos concluídos
+// Função para atualizar eventos concluídos (página de eventos concluídos)
 const atualizarEventosConcluidos = () => {
     buscarEventos('Concluído');
-    mostrarFeedback('Eventos atualizados com sucesso!', 'success');
 };
 
-// Limpar a tabela de eventos
-const limparTabelaEventos = () => {
-    tabelaEventos.innerHTML = '';
+// Função para inicializar o calendário
+const inicializarCalendario = () => {
+    // Inicialização do calendário utilizando biblioteca externa (exemplo com FullCalendar)
+    // Aqui você deve integrar o FullCalendar ou outra biblioteca de calendário de sua escolha
+    // Exemplo básico utilizando FullCalendar:
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth'
+        // Outras configurações conforme necessário
+    });
+    calendar.render();
 };
 
-// Carregar eventos no calendário ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('calendar');
-
-    fetch('https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos')
-        .then(response => response.json())
-        .then(eventos => {
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'pt-br',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                events: eventos.map(evento => ({
-                    id: evento.id,
-                    title: evento.titulo,
-                    start: evento.data,
-                    description: evento.descricao,
-                    status: evento.status,
-                    color: getColorByDateAndStatus(evento.data, evento.status)
-                })),
-                eventClick: function (info) {
-                    alert('Evento: ' + info.event.title);
-                    alert('Data: ' + info.event.start.toISOString().split('T')[0]);
-                    alert('Descrição: ' + info.event.extendedProps.description);
-                }
-            });
-
-            calendar.render();
-        })
-        .catch(error => console.error('Erro ao carregar eventos:', error));
+// Chamada para inicializar o calendário após o carregamento do DOM
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarCalendario();
 });
-
-// Função para obter a cor com base na data e no status do evento
-function getColorByDateAndStatus(date, status) {
-    const today = new Date();
-    const eventDate = new Date(date);
-    const daysDifference = (eventDate - today) / (1000 * 60 * 60 * 24);
-    if (status === 'Concluído') {
-        return '#007bff';
-    } else if (daysDifference < 2) {
-        return '#ff0000';
-    } else if (daysDifference < 7) {
-        return '#f3ff00';
-    } else {
-        return '#18ff00';
-    }
-}
 
