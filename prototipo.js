@@ -317,6 +317,8 @@ document.addEventListener('DOMContentLoaded', function () {
             calendar.render();
         })
         .catch(error => console.error('Erro ao buscar eventos:', error));
+
+    console.log("Documento carregado e script prototipo.js executado como módulo!");
 });
 
 // Função para obter a cor com base na data e no status do evento
