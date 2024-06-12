@@ -3,20 +3,20 @@ const { initializeApp, applicationDefault, cert } = require('firebase-admin/app'
 const { getFirestore, collection, addDoc, updateDoc, doc, deleteDoc, query, where, getDocs } = require('firebase-admin/firestore');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 app.use(bodyParser.json());
-app.use(cors()); // Adiciona middleware CORS
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Configurar o Firebase Admin SDK
 initializeApp({
-    credential: applicationDefault() // ou use 'cert' para credenciais específicas
+    credential: applicationDefault()
 });
 const db = getFirestore();
 
-// Endpoint para adicionar eventos
 app.post('/api/eventos', async (req, res) => {
     const { titulo, categoria, data, descricao, prioridade, status } = req.body;
 
@@ -37,7 +37,6 @@ app.post('/api/eventos', async (req, res) => {
     }
 });
 
-// Endpoint para atualizar um evento
 app.put('/api/eventos/:id', async (req, res) => {
     const { id } = req.params;
     const { titulo, categoria, data, descricao, prioridade, status } = req.body;
@@ -60,7 +59,6 @@ app.put('/api/eventos/:id', async (req, res) => {
     }
 });
 
-// Endpoint para excluir um evento
 app.delete('/api/eventos/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -74,17 +72,14 @@ app.delete('/api/eventos/:id', async (req, res) => {
     }
 });
 
-// Endpoint para buscar eventos
 app.get('/api/eventos', async (req, res) => {
     const { status, search } = req.query;
     let filtros = [];
 
-    // Se foi especificado um status, adicionamos na query
     if (status) {
         filtros.push(where('status', '==', status));
     }
 
-    // Se foi especificada uma pesquisa, adicionamos na query
     if (search) {
         filtros.push(where('titulo', '>=', search));
         filtros.push(where('titulo', '<=', search + '\uf8ff'));
@@ -105,7 +100,6 @@ app.get('/api/eventos', async (req, res) => {
     }
 });
 
-// Iniciar o servidor
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });

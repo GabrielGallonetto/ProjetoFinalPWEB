@@ -162,178 +162,174 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
-    }
+        linha.appendChild(tdAcoes);
 
-    linha.appendChild(tdAcoes);
+        // Chamar a função para definir a cor da linha
+        definirCorLinha(linha, evento);
 
-    // Chamar a função para definir a cor da linha
-    definirCorLinha(linha, evento);
-
-    return linha;
-};
-
-// Funções de manipulação de eventos
-const adicionarLinhaEvento = (evento = {}) => {
-    const linha = criarLinhaEvento(evento);
-    tabelaEventos.appendChild(linha);
-};
-
-const pesquisarEventos = () => {
-    const textoPesquisa = inputPesquisa.value.toLowerCase();
-    const linhasEventos = document.querySelectorAll('#tabelaEventos tbody tr');
-
-    linhasEventos.forEach(linha => {
-        const tituloEvento = linha.querySelector('td:nth-child(2) input').value.toLowerCase();
-        if (!tituloEvento.includes(textoPesquisa)) {
-            linha.style.display = 'none';
-        } else {
-            linha.style.display = '';
-        }
-    });
-};
-
-const buscarEventos = (status = '') => {
-    fetch(`/api/eventos?status=${status}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Erro ao buscar eventos');
-            return response.json();
-        })
-        .then(eventos => {
-            tabelaEventos.innerHTML = '';
-            eventos.forEach(evento => adicionarLinhaEvento(evento));
-        })
-        .catch(error => console.error('Erro ao buscar eventos:', error));
-};
-
-// Função para salvar um novo evento ou atualizar um existente
-const salvarEvento = (linha) => {
-    const id = linha.dataset.id || null;
-    const novoEvento = {
-        titulo: linha.querySelector('td:nth-child(2) input').value,
-        categoria: linha.querySelector('td:nth-child(3) select').value,
-        data: linha.querySelector('td:nth-child(4) input').value,
-        descricao: linha.querySelector('td:nth-child(5) input').value,
-        prioridade: linha.querySelector('td:nth-child(6) select').value,
-        status: linha.querySelector('td:nth-child(7) select').value
+        return linha;
     };
 
-    const url = id ? `/api/eventos/${id}` : '/api/eventos';
-    const method = id ? 'PUT' : 'POST';
+    // Funções de manipulação de eventos
+    const adicionarLinhaEvento = (evento = {}) => {
+        const linha = criarLinhaEvento(evento);
+        tabelaEventos.appendChild(linha);
+    };
 
-    fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(novoEvento)
-    })
-        .then(response => {
-            if (response.ok) {
-                // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
-                buscarEventos(filtroStatus.value);
-                mostrarFeedback(id ? 'Evento atualizado com sucesso!' : 'Evento adicionado com sucesso!', 'success');
+    const pesquisarEventos = () => {
+        const textoPesquisa = inputPesquisa.value.toLowerCase();
+        const linhasEventos = document.querySelectorAll('#tabelaEventos tbody tr');
+
+        linhasEventos.forEach(linha => {
+            const tituloEvento = linha.querySelector('td:nth-child(2) input').value.toLowerCase();
+            if (!tituloEvento.includes(textoPesquisa)) {
+                linha.style.display = 'none';
             } else {
-                throw new Error('Erro ao salvar evento');
+                linha.style.display = '';
             }
-        })
-        .catch(error => {
-            console.error('Erro ao salvar evento:', error);
-            mostrarFeedback('Erro ao salvar evento', 'error');
         });
-};
+    };
 
-// Função para cancelar a adição de um novo evento
-const cancelarAdicao = (linha) => {
-    linha.remove();
-};
+    const buscarEventos = (status = '') => {
+        fetch(`/api/eventos?status=${status}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Erro ao buscar eventos');
+                return response.json();
+            })
+            .then(eventos => {
+                tabelaEventos.innerHTML = '';
+                eventos.forEach(evento => adicionarLinhaEvento(evento));
+            })
+            .catch(error => console.error('Erro ao buscar eventos:', error));
+    };
 
-// Função para excluir um evento
-const excluirEvento = (id) => {
-    fetch(`/api/eventos/${id}`, {
-        method: 'DELETE'
-    })
-        .then(response => {
-            if (response.ok) {
-                // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
-                buscarEventos(filtroStatus.value);
-                mostrarFeedback('Evento excluído com sucesso!', 'success');
-            } else {
-                throw new Error('Erro ao excluir evento');
-            }
+    // Função para salvar um novo evento ou atualizar um existente
+    const salvarEvento = (linha) => {
+        const id = linha.dataset.id || null;
+        const novoEvento = {
+            titulo: linha.querySelector('td:nth-child(2) input').value,
+            categoria: linha.querySelector('td:nth-child(3) select').value,
+            data: linha.querySelector('td:nth-child(4) input').value,
+            descricao: linha.querySelector('td:nth-child(5) input').value,
+            prioridade: linha.querySelector('td:nth-child(6) select').value,
+            status: linha.querySelector('td:nth-child(7) select').value
+        };
+
+        const url = id ? `/api/eventos/${id}` : '/api/eventos';
+        const method = id ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(novoEvento)
         })
-        .catch(error => {
-            console.error('Erro ao excluir evento:', error);
-            mostrarFeedback('Erro ao excluir evento', 'error');
-        });
-};
-
-// Funções auxiliares
-const atualizarEventos = () => {
-    // Atualiza os eventos com base no status selecionado no filtro
-    buscarEventos(filtroStatus.value);
-    mostrarFeedback('Eventos atualizados com sucesso!', 'success');
-};
-
-const atualizarEventosConcluidos = () => {
-    // Atualiza os eventos concluídos
-    buscarEventos('Concluído');
-    mostrarFeedback('Eventos atualizados com sucesso!', 'success');
-};
-
-// Limpar a tabela de eventos
-const limparTabelaEventos = () => {
-    tabelaEventos.innerHTML = '';
-};
-
-// Carregar eventos no calendário ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('calendar');
-
-    fetch('/api/eventos')
-        .then(response => response.json())
-        .then(eventos => {
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'pt-br',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                events: eventos.map(evento => ({
-                    id: evento.id,
-                    title: evento.titulo,
-                    start: evento.data,
-                    description: evento.descricao,
-                    status: evento.status,
-                    color: getColorByDateAndStatus(evento.data, evento.status)
-                })),
-                eventClick: function (info) {
-                    alert('Evento: ' + info.event.title);
-                    alert('Data: ' + info.event.start.toISOString().split('T')[0]);
-                    alert('Descrição: ' + info.event.extendedProps.description);
-                    // Adicione mais interações conforme necessário
+            .then(response => {
+                if (response.ok) {
+                    // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
+                    buscarEventos(filtroStatus.value);
+                    mostrarFeedback(id ? 'Evento atualizado com sucesso!' : 'Evento adicionado com sucesso!', 'success');
+                } else {
+                    throw new Error('Erro ao salvar evento');
                 }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar evento:', error);
+                mostrarFeedback('Erro ao salvar evento', 'error');
             });
+    };
 
-            calendar.render();
+    // Função para cancelar a adição de um novo evento
+    const cancelarAdicao = (linha) => {
+        linha.remove();
+    };
+
+    // Função para excluir um evento
+    const excluirEvento = (id) => {
+        fetch(`/api/eventos/${id}`, {
+            method: 'DELETE'
         })
-        .catch(error => console.error('Erro ao buscar eventos:', error));
+            .then(response => {
+                if (response.ok) {
+                    // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
+                    buscarEventos(filtroStatus.value);
+                    mostrarFeedback('Evento excluído com sucesso!', 'success');
+                } else {
+                    throw new Error('Erro ao excluir evento');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao excluir evento:', error);
+                mostrarFeedback('Erro ao excluir evento', 'error');
+            });
+    };
 
-    console.log("Documento carregado e script prototipo.js executado como módulo!");
-});
+    // Funções auxiliares
+    const atualizarEventos = () => {
+        // Atualiza os eventos com base no status selecionado no filtro
+        buscarEventos(filtroStatus.value);
+        mostrarFeedback('Eventos atualizados com sucesso!', 'success');
+    };
 
-// Função para obter a cor com base na data e no status do evento
-function getColorByDateAndStatus(date, status) {
-    const hoje = new Date();
-    const dataEvento = new Date(date);
-    const diferencaDias = (dataEvento - hoje) / (1000 * 60 * 60 * 24);
+    const atualizarEventosConcluidos = () => {
+        // Atualiza os eventos concluídos
+        buscarEventos('Concluído');
+        mostrarFeedback('Eventos atualizados com sucesso!', 'success');
+    };
 
-    if (status === 'Concluído') {
-        return '#2435ff'; // Azul
-    } else if (diferencaDias < 2) {
-        return '#ff2424'; // Vermelho
-    } else if (diferencaDias < 7) {
-        return '#edff24'; // Amarelo
-    } else {
-        return '#24ff29'; // Verde
+    // Limpar a tabela de eventos
+    const limparTabelaEventos = () => {
+        tabelaEventos.innerHTML = '';
+    };
+
+    // Carregar eventos no calendário ao carregar a página
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        fetch('/api/eventos')
+            .then(response => response.json())
+            .then(eventos => {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'pt-br',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: eventos.map(evento => ({
+                        id: evento.id,
+                        title: evento.titulo,
+                        start: evento.data,
+                        description: evento.descricao,
+                        status: evento.status,
+                        color: getColorByDateAndStatus(evento.data, evento.status)
+                    })),
+                    eventClick: function (info) {
+                        alert('Evento: ' + info.event.title);
+                        alert('Data: ' + info.event.start.toISOString().split('T')[0]);
+                        alert('Descrição: ' + info.event.extendedProps.description);
+                    }
+                });
+
+                calendar.render();
+            })
+            .catch(error => console.error('Erro ao carregar eventos:', error));
+    });
+
+    // Função para obter a cor com base na data e no status do evento
+    function getColorByDateAndStatus(date, status) {
+        const today = new Date();
+        const eventDate = new Date(date);
+        const daysDifference = (eventDate - today) / (1000 * 60 * 60 * 24);
+
+        if (status === 'Concluído') {
+            return '#007bff';
+        } else if (daysDifference < 2) {
+            return '#ff0000';
+        } else if (daysDifference < 7) {
+            return '#f3ff00';
+        } else {
+            return '#18ff00';
+        }
     }
 }
