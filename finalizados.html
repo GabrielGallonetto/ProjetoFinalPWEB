@@ -18,14 +18,13 @@
             <div id="barraPesquisa">
                 <p>Eventos Concluídos:</p>
                 <input type="text" placeholder="Procurar evento" id="pesquisaEvento">
-                <select id="filtroStatus" style="display: none;">
+                <select id="filtroStatus">
                     <option value="">Todos</option>
                     <option value="Pendente">Pendente</option>
                     <option value="Em Andamento">Em Andamento</option>
-                    <option value="Concluído">Concluído</option>
+                    <option value="Concluído" selected>Concluído</option> <!-- Selecionado "Concluído" por padrão -->
                 </select>
             </div>
-            <p></p>
             <table id="tabelaEventos">
                 <thead>
                     <tr>
@@ -43,12 +42,12 @@
             </table>
             <div id="botoesEventos">
                 <button id="atualizarEventos">Atualizar</button>
-                <button id="adicionarEvento" style="display: none;">Adicionar Evento</button>
             </div>
             <div id="feedback"></div>
             <footer>Gabriel Gallonetto de Lima</footer>
         </div>
     </main>
-    <script src="prototipo.js" defer></script>
+    <script src="prototipo.js" defer type="module"></script>
+
 </body>
 </html>

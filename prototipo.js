@@ -1,3 +1,19 @@
+// Importar a função necessária do SDK do Firebase
+import { initializeApp } from "firebase/app";
+
+// Configurações do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAX5QTPvEICyOmk6O7ukZgujnwYZmgExuM",
+    authDomain: "eventos-15ff4.firebaseapp.com",
+    projectId: "eventos-15ff4",
+    storageBucket: "eventos-15ff4.appspot.com",
+    messagingSenderId: "675356689478",
+    appId: "1:675356689478:web:e8764cb482c4e0ad033647"
+};
+
+// Inicializar o Firebase
+const app = initializeApp(firebaseConfig);
+
 // Configurações do aplicativo
 const Config = {
     categoriasExistentes: ['Trabalho', 'Família', 'Faculdade'],
@@ -60,16 +76,16 @@ const definirCorLinha = (linha, evento) => {
     const diferencaDias = (dataEvento - hoje) / (1000 * 60 * 60 * 24);
 
     if (evento.status === 'Concluído') {
-        //Azul
+        // Azul
         linha.style = 'background: linear-gradient(270deg, rgba(0,123,255,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     } else if (diferencaDias < 2) {
-        //Vermelho
+        // Vermelho
         linha.style = 'background: linear-gradient(270deg, rgba(255,0,0,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     } else if (diferencaDias < 7) {
-        //Amarelo
+        // Amarelo
         linha.style = 'background: linear-gradient(270deg, rgba(243,255,0,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     } else {
-        //Verde
+        // Verde
         linha.style = 'background: linear-gradient(270deg, rgba(24,255,0,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     }
 };
@@ -210,10 +226,7 @@ const buscarEventos = (status = '') => {
         .catch(error => console.error('Erro ao buscar eventos:', error));
 };
 
-// const addCalendario = (evento = {}) => {
-//     calendario.append(evento);
-// }
-
+// Função para salvar um novo evento ou atualizar um existente
 const salvarEvento = (linha) => {
     const id = linha.dataset.id || null;
     const novoEvento = {
@@ -235,6 +248,7 @@ const salvarEvento = (linha) => {
     })
         .then(response => {
             if (response.ok) {
+                // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
                 buscarEventos(filtroStatus.value);
                 mostrarFeedback(id ? 'Evento atualizado com sucesso!' : 'Evento adicionado com sucesso!', 'success');
             } else {
@@ -247,16 +261,19 @@ const salvarEvento = (linha) => {
         });
 };
 
+// Função para cancelar a adição de um novo evento
 const cancelarAdicao = (linha) => {
     linha.remove();
 };
 
+// Função para excluir um evento
 const excluirEvento = (id) => {
     fetch(`/api/eventos/${id}`, {
         method: 'DELETE'
     })
         .then(response => {
             if (response.ok) {
+                // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
                 buscarEventos(filtroStatus.value);
                 mostrarFeedback('Evento excluído com sucesso!', 'success');
             } else {
@@ -271,23 +288,27 @@ const excluirEvento = (id) => {
 
 // Funções auxiliares
 const atualizarEventos = () => {
+    // Atualiza os eventos com base no status selecionado no filtro
     buscarEventos(filtroStatus.value);
     mostrarFeedback('Eventos atualizados com sucesso!', 'success');
 };
 
 const atualizarEventosConcluidos = () => {
+    // Atualiza os eventos concluídos
     buscarEventos('Concluído');
     mostrarFeedback('Eventos atualizados com sucesso!', 'success');
 };
 
+// Limpar a tabela de eventos
 const limparTabelaEventos = () => {
     tabelaEventos.innerHTML = '';
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+// Carregar eventos no calendário ao carregar a página
+document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
-    fetch('/api/eventos')  // Atualize a URL conforme necessário
+    fetch('/api/eventos')
         .then(response => response.json())
         .then(eventos => {
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -306,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     status: evento.status,
                     color: getColorByDateAndStatus(evento.data, evento.status)
                 })),
-                eventClick: function(info) {
+                eventClick: function (info) {
                     alert('Evento: ' + info.event.title);
                     alert('Data: ' + info.event.start.toISOString().split('T')[0]);
                     alert('Descrição: ' + info.event.extendedProps.description);
@@ -319,6 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Erro ao buscar eventos:', error));
 });
 
+// Função para obter a cor com base na data e no status do evento
 function getColorByDateAndStatus(date, status) {
     const hoje = new Date();
     const dataEvento = new Date(date);
@@ -334,3 +356,5 @@ function getColorByDateAndStatus(date, status) {
         return '#24ff29'; // Verde
     }
 }
+
+
