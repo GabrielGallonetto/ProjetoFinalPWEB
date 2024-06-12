@@ -1,62 +1,65 @@
 const express = require('express');
-const { initializeApp, applicationDefault } = require('firebase-admin/app');
-const { getFirestore, collection, addDoc, updateDoc, doc, deleteDoc, query, where, getDocs } = require('firebase-admin/firestore');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path'); // Importe o módulo path aqui
+const path = require('path');
+const fetch = require('node-fetch'); // Importar node-fetch para realizar requisições HTTP
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-const admin = require('firebase-admin');
-
-// Caminho para o arquivo JSON de suas credenciais de serviço
-const serviceAccount = path.join(__dirname, 'public', 'eventos-15ff4-firebase-adminsdk-udlqm-af2c49d82a.json');
-
-// Inicialize o aplicativo do Firebase Admin SDK com suas credenciais de serviço
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+const API_URL = 'https://66691b632e964a6dfed3d6e2.mockapi.io/api/eventos';
 
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const db = getFirestore();
-
+// Rota para adicionar um novo evento
 app.post('/api/eventos', async (req, res) => {
     const { titulo, categoria, data, descricao, prioridade, status } = req.body;
 
     try {
-        const docRef = await addDoc(collection(db, 'eventos'), {
-            titulo,
-            categoria,
-            data,
-            descricao,
-            prioridade,
-            status
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                titulo,
+                categoria,
+                data,
+                descricao,
+                prioridade,
+                status
+            })
         });
-        console.log("Evento adicionado com ID: ", docRef.id);
-        res.status(200).send({ id: docRef.id });
+        const data = await response.json();
+        console.log("Evento adicionado com ID: ", data.id);
+        res.status(200).send({ id: data.id });
     } catch (e) {
         console.error("Erro ao adicionar evento:", e);
         res.status(500).send("Erro ao adicionar evento");
     }
 });
 
+// Rota para atualizar um evento existente
 app.put('/api/eventos/:id', async (req, res) => {
     const { id } = req.params;
     const { titulo, categoria, data, descricao, prioridade, status } = req.body;
 
     try {
-        const eventoRef = doc(db, 'eventos', id);
-        await updateDoc(eventoRef, {
-            titulo,
-            categoria,
-            data,
-            descricao,
-            prioridade,
-            status
+        await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                titulo,
+                categoria,
+                data,
+                descricao,
+                prioridade,
+                status
+            })
         });
         console.log("Evento atualizado com ID: ", id);
         res.status(200).send("Evento atualizado com sucesso");
@@ -66,11 +69,14 @@ app.put('/api/eventos/:id', async (req, res) => {
     }
 });
 
+// Rota para excluir um evento
 app.delete('/api/eventos/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        await deleteDoc(doc(db, 'eventos', id));
+        await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
+        });
         console.log("Evento excluído com ID: ", id);
         res.status(200).send("Evento excluído com sucesso");
     } catch (e) {
@@ -79,34 +85,37 @@ app.delete('/api/eventos/:id', async (req, res) => {
     }
 });
 
+// Rota para buscar todos os eventos
 app.get('/api/eventos', async (req, res) => {
-    const { status, search } = req.query;
-    let filtros = [];
-
-    if (status) {
-        filtros.push(where('status', '==', status));
-    }
-
-    if (search) {
-        filtros.push(where('titulo', '>=', search));
-        filtros.push(where('titulo', '<=', search + '\uf8ff'));
-    }
-
-    let eventosQuery = collection(db, 'eventos');
-    if (filtros.length > 0) {
-        eventosQuery = query(eventosQuery, ...filtros);
-    }
+    const { status } = req.query;
+    const url = status ? `${API_URL}?status=${status}` : API_URL;
 
     try {
-        const eventosSnapshot = await getDocs(eventosQuery);
-        const eventos = eventosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        res.status(200).json(eventos);
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Eventos buscados com status:", status);
+        res.status(200).json(data);
     } catch (e) {
         console.error("Erro ao buscar eventos:", e);
         res.status(500).send("Erro ao buscar eventos");
     }
 });
 
+// Rota para buscar um evento pelo ID
+app.get('/api/eventos/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`);
+        const data = await response.json();
+        console.log("Evento buscado com ID:", id);
+        res.status(200).json(data);
+    } catch (e) {
+        console.error("Erro ao buscar evento:", e);
+        res.status(500).send("Erro ao buscar evento");
+    }
+});
+
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando na porta ${port}`);
 });
