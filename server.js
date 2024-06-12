@@ -1,25 +1,20 @@
 const express = require('express');
-const { initializeApp } = require('firebase-admin/app');
+const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
 const { getFirestore, collection, addDoc, updateDoc, doc, deleteDoc, query, where, getDocs } = require('firebase-admin/firestore');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 const port = 4000;
 
 app.use(bodyParser.json());
+app.use(cors()); // Adiciona middleware CORS
 
-// Configurar o Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyAX5QTPvEICyOmk6O7ukZgujnwYZmgExuM",
-    authDomain: "eventos-15ff4.firebaseapp.com",
-    projectId: "eventos-15ff4",
-    storageBucket: "eventos-15ff4.appspot.com",
-    messagingSenderId: "675356689478",
-    appId: "1:675356689478:web:e8764cb482c4e0ad033647"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+// Configurar o Firebase Admin SDK
+initializeApp({
+    credential: applicationDefault() // ou use 'cert' para credenciais específicas
+});
+const db = getFirestore();
 
 // Endpoint para adicionar eventos
 app.post('/api/eventos', async (req, res) => {
@@ -82,20 +77,26 @@ app.delete('/api/eventos/:id', async (req, res) => {
 // Endpoint para buscar eventos
 app.get('/api/eventos', async (req, res) => {
     const { status, search } = req.query;
-    let eventosRef = collection(db, 'eventos');
+    let filtros = [];
 
     // Se foi especificado um status, adicionamos na query
     if (status) {
-        eventosRef = query(eventosRef, where('status', '==', status));
+        filtros.push(where('status', '==', status));
     }
 
     // Se foi especificada uma pesquisa, adicionamos na query
     if (search) {
-        eventosRef = query(eventosRef, where('titulo', '>=', search).where('titulo', '<=', search + '\uf8ff'));
+        filtros.push(where('titulo', '>=', search));
+        filtros.push(where('titulo', '<=', search + '\uf8ff'));
+    }
+
+    let eventosQuery = collection(db, 'eventos');
+    if (filtros.length > 0) {
+        eventosQuery = query(eventosQuery, ...filtros);
     }
 
     try {
-        const eventosSnapshot = await getDocs(eventosRef);
+        const eventosSnapshot = await getDocs(eventosQuery);
         const eventos = eventosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.status(200).json(eventos);
     } catch (e) {

@@ -1,19 +1,3 @@
-// Importar a função necessária do SDK do Firebase
-import { initializeApp } from "firebase/app";
-
-// Configurações do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyAX5QTPvEICyOmk6O7ukZgujnwYZmgExuM",
-    authDomain: "eventos-15ff4.firebaseapp.com",
-    projectId: "eventos-15ff4",
-    storageBucket: "eventos-15ff4.appspot.com",
-    messagingSenderId: "675356689478",
-    appId: "1:675356689478:web:e8764cb482c4e0ad033647"
-};
-
-// Inicializar o Firebase
-const app = initializeApp(firebaseConfig);
-
 // Configurações do aplicativo
 const Config = {
     categoriasExistentes: ['Trabalho', 'Família', 'Faculdade'],
@@ -27,7 +11,6 @@ const feedback = document.querySelector('#feedback');
 const filtroStatus = document.querySelector('#filtroStatus');
 const inputPesquisa = document.getElementById('pesquisaEvento');
 const botaoAtualizar = document.getElementById('atualizarEventos');
-const botaoLimpar = document.getElementById('limparEventos');
 const botaoAdicionar = document.getElementById('adicionarEvento');
 const calendario = document.getElementById('calendar');
 
@@ -76,16 +59,12 @@ const definirCorLinha = (linha, evento) => {
     const diferencaDias = (dataEvento - hoje) / (1000 * 60 * 60 * 24);
 
     if (evento.status === 'Concluído') {
-        // Azul
         linha.style = 'background: linear-gradient(270deg, rgba(0,123,255,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     } else if (diferencaDias < 2) {
-        // Vermelho
         linha.style = 'background: linear-gradient(270deg, rgba(255,0,0,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     } else if (diferencaDias < 7) {
-        // Amarelo
         linha.style = 'background: linear-gradient(270deg, rgba(243,255,0,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     } else {
-        // Verde
         linha.style = 'background: linear-gradient(270deg, rgba(24,255,0,1) 0%, rgba(71,71,135,1) 5%, rgba(44,44,84,1) 65%);';
     }
 };
@@ -356,5 +335,3 @@ function getColorByDateAndStatus(date, status) {
         return '#24ff29'; // Verde
     }
 }
-
-
