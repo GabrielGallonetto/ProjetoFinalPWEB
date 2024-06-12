@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Funções de manipulação de DOM e Event Listeners
 const adicionarEventListeners = () => {
     inputPesquisa.addEventListener('input', pesquisarEventos);
-    botaoAdicionar.addEventListener('click', adicionarLinhaEvento);
+    botaoAdicionar.addEventListener('click', () => adicionarLinhaEvento());
     filtroStatus.addEventListener('change', () => buscarEventos(filtroStatus.value));
 
     if (document.title === 'Finalizados') {
@@ -162,12 +162,13 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
+        linha.appendChild(tdAcoes);
+
+        // Chamar a função para definir a cor da linha
+        definirCorLinha(linha, evento);
+
+        return linha;
     }
-
-    linha.appendChild(tdAcoes);
-
-    // Chamar a função para definir a cor da linha
-    definirCorLinha(linha, evento);
 
     tabelaEventos.appendChild(linha);
 };
@@ -194,7 +195,7 @@ const pesquisarEventos = () => {
 
 // Função para buscar eventos com base no status
 const buscarEventos = (status = '') => {
-    fetch(`/api/eventos${status ? '?status=' + status : ''}`)
+    fetch(`http://localhost:4000/api/eventos?status=${status}`)
         .then(response => {
             if (!response.ok) throw new Error('Erro ao buscar eventos');
             return response.json();
@@ -218,7 +219,7 @@ const salvarEvento = (linha) => {
         status: linha.querySelector('td:nth-child(7) select').value
     };
 
-    const url = id ? `/api/eventos/${id}` : '/api/eventos';
+    const url = id ? `http://localhost:4000/api/eventos/${id}` : 'http://localhost:4000/api/eventos';
     const method = id ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -230,7 +231,7 @@ const salvarEvento = (linha) => {
             if (response.ok) {
                 // Se a operação for bem-sucedida, atualiza a tabela de eventos e exibe o feedback
                 buscarEventos(filtroStatus.value);
-                mostrarFeedback(id ? 'Evento atualizado com sucesso!' : 'Evento adicionado com sucesso!', 'success');
+                mostrarFeedback(id ? 'Evento atualizado comsucesso!' : 'Evento adicionado com sucesso!', 'success');
             } else {
                 throw new Error('Erro ao salvar evento');
             }
@@ -248,7 +249,7 @@ const cancelarAdicao = (linha) => {
 
 // Função para excluir um evento
 const excluirEvento = (id) => {
-    fetch(`/api/eventos/${id}`, {
+    fetch(`http://localhost:4000/api/eventos/${id}`, {
         method: 'DELETE'
     })
         .then(response => {
@@ -284,13 +285,13 @@ const limparTabelaEventos = () => {
 };
 
 // Carregar eventos no calendário ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    const calendarEl = document.getElementById('calendar');
+document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
 
-    fetch('/api/eventos')
+    fetch('http://localhost:4000/api/eventos')
         .then(response => response.json())
         .then(eventos => {
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+            var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'pt-br',
                 headerToolbar: {
@@ -323,7 +324,6 @@ function getColorByDateAndStatus(date, status) {
     const today = new Date();
     const eventDate = new Date(date);
     const daysDifference = (eventDate - today) / (1000 * 60 * 60 * 24);
-
     if (status === 'Concluído') {
         return '#007bff';
     } else if (daysDifference < 2) {
@@ -334,4 +334,3 @@ function getColorByDateAndStatus(date, status) {
         return '#18ff00';
     }
 }
-
