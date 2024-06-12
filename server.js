@@ -44,9 +44,6 @@ app.post('/api/eventos', async (req, res) => {
     }
 });
 
-// Restante do código permanece o mesmo
-
-
 app.put('/api/eventos/:id', async (req, res) => {
     const { id } = req.params;
     const { titulo, categoria, data, descricao, prioridade, status } = req.body;
