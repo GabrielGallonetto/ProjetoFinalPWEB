@@ -85,6 +85,7 @@ const definirCorLinha = (linha, evento) => {
 };
 
 // Função para criar uma linha de evento
+// Função para criar uma linha de evento
 const criarLinhaEvento = (evento = {}) => {
     const linha = document.createElement('tr');
     linha.dataset.id = evento.id || '';
@@ -177,13 +178,9 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
-        linha.appendChild(tdAcoes);
-
-        // Chamar a função para definir a cor da linha
-        definirCorLinha(linha, evento);
-
-        return linha;
     }
+
+    linha.appendChild(tdAcoes);
 
     tabelaEventos.appendChild(linha);
 };
