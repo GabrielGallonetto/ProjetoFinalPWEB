@@ -19,13 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     adicionarEventListeners();
 
     if (document.title === 'Finalizados') {
-        // Remover o elemento de filtro de status se existir
         if (filtroStatus) {
             filtroStatus.style.display = 'none';
         }
         buscarEventos('Concluído');
     } else {
-        // Mostrar filtro de status e carregar eventos ao carregar a página
         if (filtroStatus) {
             filtroStatus.style.display = 'inline-block';
         }
@@ -74,13 +72,13 @@ const definirCorLinha = (linha, evento) => {
     const diferencaDias = (dataEvento - hoje) / (1000 * 60 * 60 * 24);
 
     if (evento.status === 'Concluído') {
-        linha.style.background = '#007bff';
+        linha.style.background = '#f3ff00'; 
     } else if (diferencaDias < 2) {
-        linha.style.background = '#ff0000';
-    } else if (diferencaDias < 7) {
-        linha.style.background = '#f3ff00';
-    } else {
         linha.style.background = '#18ff00';
+    } else if (diferencaDias < 7) {
+        linha.style.background = '#007bff'; 
+    } else {
+        linha.style.background = '#ff0000'; 
     }
 };
 
@@ -122,7 +120,7 @@ const criarLinhaEvento = (evento = {}) => {
     const inputData = document.createElement('input');
     inputData.type = 'date';
     inputData.value = evento.data || '';
-    inputData.min = new Date().toISOString().split('T')[0]; // Define a data mínima como hoje
+    inputData.min = new Date().toISOString().split('T')[0];
     tdData.appendChild(inputData);
     linha.appendChild(tdData);
 
@@ -172,7 +170,7 @@ const criarLinhaEvento = (evento = {}) => {
     btnCancelar.addEventListener('click', () => cancelarAdicao(linha));
     tdAcoes.appendChild(btnCancelar);
 
-    if (evento.id) { // Adicionar botão Excluir apenas para eventos existentes
+    if (evento.id) {
         const btnExcluir = document.createElement('button');
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
@@ -181,7 +179,6 @@ const criarLinhaEvento = (evento = {}) => {
 
     linha.appendChild(tdAcoes);
 
-    // Chamar a função para definir a cor da linha
     definirCorLinha(linha, evento);
 
     tabelaEventos.appendChild(linha);
@@ -241,7 +238,7 @@ const salvarEvento = (linha) => {
             if (id) {
                 mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
             } else {
-                linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
+                linha.dataset.id = response.data.id;
                 mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
             }
         })
@@ -256,7 +253,7 @@ const excluirEvento = (id) => {
     axios.delete(`/api/eventos/${id}`)
         .then(response => {
             mostrarFeedback('Evento excluído com sucesso!', 'alert alert-success');
-            buscarEventos(filtroStatus.value); // Atualizar a lista de eventos após exclusão
+            buscarEventos(filtroStatus.value);
         })
         .catch(error => {
             console.error('Erro ao excluir evento:', error);
@@ -271,7 +268,7 @@ const atualizarEventos = () => {
 
 // Função para cancelar a adição ou edição de um evento
 const cancelarAdicao = (linha) => {
-    if (!linha.dataset.id) { // Remover a linha apenas se for uma adição cancelada
+    if (!linha.dataset.id) {
         linha.remove();
     }
 };
