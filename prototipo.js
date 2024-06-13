@@ -177,12 +177,12 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
-
-        // Chamar a função para definir a cor da linha
-        definirCorLinha(linha, evento);
     }
 
     linha.appendChild(tdAcoes);
+
+    // Chamar a função para definir a cor da linha
+    definirCorLinha(linha, evento);
 
     tabelaEventos.appendChild(linha);
 };
