@@ -19,26 +19,41 @@ document.addEventListener('DOMContentLoaded', () => {
     adicionarEventListeners();
 
     if (document.title === 'Finalizados') {
-        // Remover o elemento de filtro de status
-        filtroStatus.style.display = 'none';
+        // Remover o elemento de filtro de status se existir
+        if (filtroStatus) {
+            filtroStatus.style.display = 'none';
+        }
         buscarEventos('Concluído');
     } else {
         // Mostrar filtro de status e carregar eventos ao carregar a página
-        filtroStatus.style.display = 'inline-block';
-        buscarEventos(filtroStatus.value);
+        if (filtroStatus) {
+            filtroStatus.style.display = 'inline-block';
+        }
+        if (filtroStatus && filtroStatus.value) {
+            buscarEventos(filtroStatus.value);
+        }
     }
 });
 
 // Funções de manipulação de DOM e Event Listeners
 const adicionarEventListeners = () => {
-    inputPesquisa.addEventListener('input', pesquisarEventos);
-    botaoAdicionar.addEventListener('click', adicionarLinhaEvento);
-    filtroStatus.addEventListener('change', () => buscarEventos(filtroStatus.value));
-
-    if (document.title === 'Finalizados') {
-        botaoAtualizar.addEventListener('click', atualizarEventosConcluidos);
-    } else {
-        botaoAtualizar.addEventListener('click', atualizarEventos);
+    if (inputPesquisa) {
+        inputPesquisa.addEventListener('input', pesquisarEventos);
+    }
+    if (botaoAdicionar) {
+        botaoAdicionar.addEventListener('click', adicionarLinhaEvento);
+    }
+    if (filtroStatus) {
+        filtroStatus.addEventListener('change', () => buscarEventos(filtroStatus.value));
+    }
+    if (botaoAtualizar) {
+        botaoAtualizar.addEventListener('click', () => {
+            if (document.title === 'Finalizados') {
+                atualizarEventosConcluidos();
+            } else {
+                atualizarEventos();
+            }
+        });
     }
 };
 
@@ -197,11 +212,14 @@ const pesquisarEventos = () => {
 const buscarEventos = (status = '') => {
     axios.get(`/api/eventos?status=${status}`)
         .then(response => {
-            tabelaEventos.innerHTML = '';
-            response.data.forEach(evento => adicionarLinhaEvento(evento));
+            if (tabelaEventos) {
+                tabelaEventos.innerHTML = '';
+                response.data.forEach(evento => adicionarLinhaEvento(evento));
+            }
         })
         .catch(error => {
             console.error('Erro ao buscar eventos:', error);
+            mostrarFeedback('Erro ao buscar eventos', 'alert alert-danger');
         });
 };
 
@@ -217,26 +235,22 @@ const salvarEvento = (linha) => {
         status: linha.querySelector('td:nth-child(7) select').value
     };
 
-    if (id) { // Atualizar evento existente
-        axios.put(`/api/eventos/${id}`, novoEvento)
-            .then(response => {
+    const method = id ? 'put' : 'post';
+    const url = id ? `/api/eventos/${id}` : '/api/eventos';
+
+    axios[method](url, novoEvento)
+        .then(response => {
+            if (id) {
                 mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
-            })
-            .catch(error => {
-                console.error('Erro ao atualizar evento:', error);
-                mostrarFeedback('Erro ao atualizar evento', 'alert alert-danger');
-            });
-    } else { // Salvar novo evento
-        axios.post('/api/eventos', novoEvento)
-            .then(response => {
+            } else {
                 linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
                 mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
-            })
-            .catch(error => {
-                console.error('Erro ao salvar evento:', error);
-                mostrarFeedback('Erro ao salvar evento', 'alert alert-danger');
-            });
-    }
+            }
+        })
+        .catch(error => {
+            console.error(`Erro ao ${id ? 'atualizar' : 'salvar'} evento:`, error);
+            mostrarFeedback(`Erro ao ${id ? 'atualizar' : 'salvar'} evento`, 'alert alert-danger');
+        });
 };
 
 // Função para excluir um evento

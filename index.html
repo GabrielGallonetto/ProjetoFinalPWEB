@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Inicial</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <main>
         <nav id="navegador">
             <div id="icone"><img id="iconeSite" src="iconeSite.png" alt="Icone do Site">Gerenciador de Tarefas</div>
-            <h2><a id="opcaoAtual" href="index.html">EVENTOS</a></h2>
+            <h2><a id="opcaoIndex" href="index.html">EVENTOS</a></h2>
             <h2><a id="opcaoFinalizados" href="finalizados.html">FINALIZADOS</a></h2>
             <h2><a id="opcaoCalendario" href="calendario.html">CALENDÁRIO</a></h2>
         </nav>
@@ -51,6 +54,5 @@
         </div>
     </main>
     <script src="prototipo.js" defer type="module"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>
 </html>
