@@ -85,7 +85,6 @@ const definirCorLinha = (linha, evento) => {
 };
 
 // Função para criar uma linha de evento
-// Função para criar uma linha de evento
 const criarLinhaEvento = (evento = {}) => {
     const linha = document.createElement('tr');
     linha.dataset.id = evento.id || '';
@@ -178,6 +177,9 @@ const criarLinhaEvento = (evento = {}) => {
         btnExcluir.textContent = 'Excluir';
         btnExcluir.addEventListener('click', () => excluirEvento(evento.id));
         tdAcoes.appendChild(btnExcluir);
+
+        // Chamar a função para definir a cor da linha
+        definirCorLinha(linha, evento);
     }
 
     linha.appendChild(tdAcoes);
@@ -234,20 +236,19 @@ const salvarEvento = (linha) => {
 
     const method = id ? 'put' : 'post';
     const url = id ? `/api/eventos/${id}` : '/api/eventos';
-
     axios[method](url, novoEvento)
-        .then(response => {
-            if (id) {
-                mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
-            } else {
-                linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
-                mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
-            }
-        })
-        .catch(error => {
-            console.error(`Erro ao ${id ? 'atualizar' : 'salvar'} evento:`, error);
-            mostrarFeedback(`Erro ao ${id ? 'atualizar' : 'salvar'} evento`, 'alert alert-danger');
-        });
+    .then(response => {
+        if (id) {
+            mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
+        } else {
+            linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
+            mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
+        }
+    })
+    .catch(error => {
+        console.error(`Erro ao ${id ? 'atualizar' : 'salvar'} evento:`, error);
+        mostrarFeedback(`Erro ao ${id ? 'atualizar' : 'salvar'} evento`, 'alert alert-danger');
+    });
 };
 
 // Função para excluir um evento
@@ -291,4 +292,3 @@ const inicializarCalendario = () => {
 
 // Inicialização do calendário
 inicializarCalendario();
-
