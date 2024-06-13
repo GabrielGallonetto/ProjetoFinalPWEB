@@ -237,18 +237,18 @@ const salvarEvento = (linha) => {
     const method = id ? 'put' : 'post';
     const url = id ? `/api/eventos/${id}` : '/api/eventos';
     axios[method](url, novoEvento)
-    .then(response => {
-        if (id) {
-            mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
-        } else {
-            linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
-            mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
-        }
-    })
-    .catch(error => {
-        console.error(`Erro ao ${id ? 'atualizar' : 'salvar'} evento:`, error);
-        mostrarFeedback(`Erro ao ${id ? 'atualizar' : 'salvar'} evento`, 'alert alert-danger');
-    });
+        .then(response => {
+            if (id) {
+                mostrarFeedback('Evento atualizado com sucesso!', 'alert alert-success');
+            } else {
+                linha.dataset.id = response.data.id; // Adicionar o ID retornado pelo servidor
+                mostrarFeedback('Evento salvo com sucesso!', 'alert alert-success');
+            }
+        })
+        .catch(error => {
+            console.error(`Erro ao ${id ? 'atualizar' : 'salvar'} evento:`, error);
+            mostrarFeedback(`Erro ao ${id ? 'atualizar' : 'salvar'} evento`, 'alert alert-danger');
+        });
 };
 
 // Função para excluir um evento
